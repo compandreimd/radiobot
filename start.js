@@ -24,8 +24,9 @@ client.connect();
  * @param what what to plat
  * @param where
  */
-function  play(what, where) {
-	console.log("Now Playing "+what);
+function  play(index, where) {
+	let what = config.playlist[index];
+	console.log("Now Playing " + what);
 	if(what.lastIndexOf("http") === 0)
 		request(what).pipe(where);
 	else
@@ -47,18 +48,21 @@ client.on('ready', function() {
 			if (err) return console.error(err);
 
 			//Start playing
-			let toPlay = config.playlist[i];
-			play(toPlay, stream);
+			play(i, stream);
 
 			//End playing
 			stream.on('done', function() {
 				i++;
-				console.log(i);
 				if(i >= config.playlist.length)
-					if(config.loop) //Play Infinitly
+					if(config.loop){
 						i = 0;
+						play(i, stream);
+					}
 					else
 						client.disconnect();
+				else
+					play(i, stream);
+
 			});
 		});
 	});
